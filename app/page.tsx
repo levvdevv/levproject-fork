@@ -31,41 +31,6 @@ import {
   ExternalLink,
 } from "lucide-react"
 
-const defaultProjects = [
-  { id: "1", name: "L.AI - Lepai", url: "https://lepai.my.id", icon: "Laptop", featured: true },
-  { id: "2", name: "Grow a Garden - Info Stok", url: "https://gagstok.netlify.app/", icon: "Seedling", featured: true },
-  { id: "3", name: "Alevia AI", url: "https://alevia.netlify.app/", icon: "Bot", featured: true },
-  { id: "4", name: "AdaQur'an", url: "https://adaquran.netlify.app/", icon: "BookOpen", featured: true },
-  { id: "5", name: "MarkpadC", url: "https://markpadc.netlify.app", icon: "Code", featured: false },
-  { id: "6", name: "ColorPall", url: "https://colorpall.vercel.app/", icon: "Palette", featured: false },
-  { id: "7", name: "Al-Qur'an Website", url: "https://alquran-website.vercel.app/", icon: "BookOpen", featured: false },
-  { id: "8", name: "Tabungin aja", url: "https://tabunginaja.netlify.app/", icon: "PiggyBank", featured: false },
-  { id: "9", name: "XCodeBro", url: "https://xcodebro.netlify.app/", icon: "Code", featured: false },
-  {
-    id: "10",
-    name: "Smart Bookmark Link",
-    url: "https://smart-bookmark.netlify.app/",
-    icon: "Bookmark",
-    featured: false,
-  },
-  { id: "11", name: "Up Scale Image", url: "https://upsclaceimg.netlify.app/", icon: "ImageIcon", featured: false },
-  { id: "12", name: "Uangku", url: "https://uangku-levv.vercel.app/", icon: "Wallet", featured: false },
-  { id: "13", name: "UpEcha", url: "https://upecha.netlify.app/", icon: "Upload", featured: false },
-  { id: "14", name: "AInventory", url: "https://ainven.netlify.app", icon: "Warehouse", featured: false },
-  {
-    id: "15",
-    name: "Ngeluh Dulu Baru Tenang",
-    url: "https://ngeluh.koyeb.app",
-    icon: "MessageCircle",
-    featured: false,
-  },
-  { id: "16", name: "Twenty Note", url: "https://twentynote.netlify.app/", icon: "StickyNote", featured: false },
-  { id: "17", name: "Bunny Task", url: "https://bunnytask.netlify.app/", icon: "CheckSquare", featured: false },
-  { id: "18", name: "Alevia Downloader", url: "https://aleviadl.netlify.app/", icon: "Download", featured: false },
-  { id: "19", name: "9Mod", url: "https://9mod.com/", icon: "Puzzle", featured: false },
-  { id: "20", name: "Ayo Anon", url: "https://ayoanon.netlify.app/", icon: "UserX", featured: false },
-]
-
 const iconMap: { [key: string]: any } = {
   Laptop,
   Seedling,
@@ -101,16 +66,18 @@ export default function Portfolio() {
   const [projects, setProjects] = useState<Project[]>(defaultProjects)
 
   useEffect(() => {
-    const adminProjects = localStorage.getItem("admin_projects")
-    if (adminProjects) {
+    // Load projects from admin panel
+    const savedProjects = localStorage.getItem("admin_projects")
+    if (savedProjects) {
       try {
-        const parsedProjects = JSON.parse(adminProjects)
-        if (parsedProjects.length > 0) {
-          setProjects(parsedProjects)
-        }
+        const parsedProjects = JSON.parse(savedProjects)
+        setProjects(parsedProjects)
       } catch (error) {
-        console.log("[v0] Error loading admin projects:", error)
+        console.log("Error loading projects:", error)
+        setProjects([])
       }
+    } else {
+      setProjects([])
     }
   }, [])
 
@@ -181,33 +148,90 @@ export default function Portfolio() {
         </div>
 
         <div className="space-y-2 sm:space-y-3">
-          {filteredProjects.map((project, index) => (
-            <Card
-              key={project.id}
-              className="cursor-pointer hover:shadow-lg transition-all duration-300 border border-gray-200 hover:border-gray-300 hover:-translate-y-0.5 animate-in fade-in slide-in-from-bottom duration-500"
-              style={{ animationDelay: `${index * 50}ms` }}
-              onClick={() => handleRedirect(project.url)}
-            >
-              <CardContent className="p-3 sm:p-4">
-                <div className="flex items-center space-x-3">
-                  <div className="p-1.5 sm:p-2 bg-gray-100 rounded-lg transition-colors duration-200 group-hover:bg-gray-200">
-                    {getIconComponent(project.icon)}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-900 text-sm sm:text-base">{project.name}</h3>
-                  </div>
-                  {project.featured && (
-                    <div className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Featured</div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          {/* Featured Projects Section */}
+          {filteredProjects.some(p => p.featured) && (
+            <div className="mb-6">
+              <h2 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                Paling Banyak Dikunjungi
+              </h2>
+              <div className="space-y-2">
+                {filteredProjects.filter(project => project.featured).map((project, index) => (
+                  <Card
+                    key={project.id}
+                    className="cursor-pointer hover:shadow-lg transition-all duration-300 border border-blue-200 bg-blue-50 hover:bg-blue-100 hover:-translate-y-0.5 animate-in fade-in slide-in-from-bottom duration-500"
+                    style={{ animationDelay: `${index * 50}ms` }}
+                    onClick={() => handleRedirect(project.url)}
+                  >
+                    <CardContent className="p-3 sm:p-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="p-1.5 sm:p-2 bg-blue-200 rounded-lg transition-colors duration-200">
+                          {getIconComponent(project.icon)}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-medium text-gray-900 text-sm sm:text-base">{project.name}</h3>
+                        </div>
+                        <div className="px-2 py-1 bg-blue-200 text-blue-800 text-xs rounded-full">Featured</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Other Projects Section */}
+          {filteredProjects.some(p => !p.featured) && (
+            <div>
+              <h2 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+                Project Lainnya
+              </h2>
+              <div className="space-y-2">
+                {filteredProjects.filter(project => !project.featured).map((project, index) => (
+                  <Card
+                    key={project.id}
+                    className="cursor-pointer hover:shadow-lg transition-all duration-300 border border-gray-200 hover:border-gray-300 hover:-translate-y-0.5 animate-in fade-in slide-in-from-bottom duration-500"
+                    style={{ animationDelay: `${(index + filteredProjects.filter(p => p.featured).length) * 50}ms` }}
+                    onClick={() => handleRedirect(project.url)}
+                  >
+                    <CardContent className="p-3 sm:p-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="p-1.5 sm:p-2 bg-gray-100 rounded-lg transition-colors duration-200">
+                          {getIconComponent(project.icon)}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-medium text-gray-900 text-sm sm:text-base">{project.name}</h3>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
-        {filteredProjects.length === 0 && (
+        {filteredProjects.length === 0 && projects.length > 0 && (
           <div className="text-center py-8">
-            <p className="text-gray-500">Tidak ada project yang ditemukan</p>
+            <p className="text-gray-500">Tidak ada project yang ditemukan dengan kata kunci "{searchTerm}"</p>
+          </div>
+        )}
+
+        {projects.length === 0 && (
+          <div className="text-center py-8">
+            <Card
+              className="border-dashed border-2 border-gray-300 bg-gray-50"
+            >
+              <CardContent className="p-8 text-center">
+                <div className="w-12 h-12 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
+                  <Code className="w-6 h-6 text-gray-400" />
+                </div>
+                <p className="text-gray-500 mb-2">Belum ada project yang tersedia</p>
+                <p className="text-sm text-gray-400">Admin belum menambahkan project apapun</p>
+              </CardContent>
+            </Card>
+          <div className="text-center py-8">
           </div>
         )}
 

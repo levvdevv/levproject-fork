@@ -33,6 +33,33 @@ export default function AdminLogin() {
     featured: false,
   })
 
+  // Default projects with proper featured status
+  const defaultProjects: Project[] = [
+    // PALING BANYAK DIKUNJUNGI (Featured projects)
+    { id: "1", name: "L.AI - Lepai", url: "https://lepai.my.id", icon: "Laptop", featured: true },
+    { id: "2", name: "Grow a Garden - Info Stok", url: "https://gagstok.netlify.app/", icon: "Seedling", featured: true },
+    { id: "3", name: "Alevia AI", url: "https://alevia.netlify.app/", icon: "Bot", featured: true },
+    { id: "4", name: "AdaQur'an", url: "https://adaquran.netlify.app/", icon: "BookOpen", featured: true },
+    
+    // PROJECT LAINNYA (Non-featured projects)
+    { id: "5", name: "MarkpadC", url: "https://markpadc.netlify.app", icon: "Code", featured: false },
+    { id: "6", name: "ColorPall", url: "https://colorpall.vercel.app/", icon: "Palette", featured: false },
+    { id: "7", name: "Al-Qur'an Website", url: "https://alquran-website.vercel.app/", icon: "BookOpen", featured: false },
+    { id: "8", name: "Tabungin aja", url: "https://tabunginaja.netlify.app/", icon: "PiggyBank", featured: false },
+    { id: "9", name: "XCodeBro", url: "https://xcodebro.netlify.app/", icon: "Code", featured: false },
+    { id: "10", name: "Smart Bookmark Link", url: "https://smart-bookmark.netlify.app/", icon: "Bookmark", featured: false },
+    { id: "11", name: "Up Scale Image", url: "https://upsclaceimg.netlify.app/", icon: "ImageIcon", featured: false },
+    { id: "12", name: "Uangku", url: "https://uangku-levv.vercel.app/", icon: "Wallet", featured: false },
+    { id: "13", name: "UpEcha", url: "https://upecha.netlify.app/", icon: "Upload", featured: false },
+    { id: "14", name: "AInventory", url: "https://ainven.netlify.app", icon: "Warehouse", featured: false },
+    { id: "15", name: "Ngeluh Dulu Baru Tenang", url: "https://ngeluh.koyeb.app", icon: "MessageCircle", featured: false },
+    { id: "16", name: "Twenty Note", url: "https://twentynote.netlify.app/", icon: "StickyNote", featured: false },
+    { id: "17", name: "Bunny Task", url: "https://bunnytask.netlify.app/", icon: "CheckSquare", featured: false },
+    { id: "18", name: "Alevia Downloader", url: "https://aleviadl.netlify.app/", icon: "Download", featured: false },
+    { id: "19", name: "9Mod", url: "https://9mod.com/", icon: "Puzzle", featured: false },
+    { id: "20", name: "Ayo Anon", url: "https://ayoanon.netlify.app/", icon: "UserX", featured: false },
+  ]
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -57,7 +84,18 @@ export default function AdminLogin() {
 
     const savedProjects = localStorage.getItem("admin_projects")
     if (savedProjects) {
-      setProjects(JSON.parse(savedProjects))
+      try {
+        const parsedProjects = JSON.parse(savedProjects)
+        setProjects(parsedProjects)
+      } catch (error) {
+        // If there's an error parsing, use default projects
+        setProjects(defaultProjects)
+        localStorage.setItem("admin_projects", JSON.stringify(defaultProjects))
+      }
+    } else {
+      // If no saved projects, use default projects
+      setProjects(defaultProjects)
+      localStorage.setItem("admin_projects", JSON.stringify(defaultProjects))
     }
   }, [])
 
@@ -76,13 +114,14 @@ export default function AdminLogin() {
   const handleAddProject = () => {
     if (newProject.name && newProject.url) {
       const project: Project = {
-        id: Date.now().toString(),
+        id: `new_${Date.now()}`,
         name: newProject.name,
         url: newProject.url,
         icon: newProject.icon || "https://via.placeholder.com/32",
         featured: newProject.featured,
       }
-      saveProjects([...projects, project])
+      // Add new project at the beginning (teratas)
+      saveProjects([project, ...projects])
       setNewProject({ name: "", url: "", icon: "", featured: false })
       setIsAddingProject(false)
     }
@@ -229,47 +268,101 @@ export default function AdminLogin() {
               {projects.length === 0 ? (
                 <p className="text-gray-500 text-center py-8">Belum ada project. Tambahkan project pertama Anda!</p>
               ) : (
-                <div className="space-y-3">
-                  {projects.map((project) => (
-                    <div
-                      key={project.id}
-                      className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <img
-                          src={project.icon || "/placeholder.svg"}
-                          alt={project.name}
-                          className="w-8 h-8 rounded object-cover"
-                        />
-                        <div>
-                          <h3 className="font-medium text-gray-900">{project.name}</h3>
-                          <p className="text-sm text-gray-500">{project.url}</p>
-                          {project.featured && (
-                            <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full mt-1">
-                              Unggulan
-                            </span>
-                          )}
-                        </div>
-                      </div>
+                <div className="space-y-4">
+                  {/* Featured Projects Section */}
+                  {projects.some(p => p.featured) && (
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
+                        <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                        Paling Banyak Dikunjungi ({projects.filter(p => p.featured).length})
+                      </h4>
+                      <div className="space-y-2">
+                        {projects.filter(project => project.featured).map((project) => (
+                          <div
+                            key={project.id}
+                            className="flex items-center justify-between p-4 border border-blue-200 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-200"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <img
+                                src={project.icon || "/placeholder.svg"}
+                                alt={project.name}
+                                className="w-8 h-8 rounded object-cover"
+                              />
+                              <div>
+                                <h3 className="font-medium text-gray-900 text-sm sm:text-base">{project.name}</h3>
+                                <p className="text-sm text-gray-500">{project.url}</p>
+                                <span className="inline-block px-2 py-1 text-xs bg-blue-200 text-blue-800 rounded-full mt-1">
+                                  Featured
+                                </span>
+                              </div>
+                            </div>
 
-                      <div className="flex items-center space-x-2">
-                        <Button size="sm" variant="outline" onClick={() => window.open(project.url, "_blank")}>
-                          <ExternalLink className="w-4 h-4" />
-                        </Button>
-                        <Button size="sm" variant="outline" onClick={() => handleEditProject(project)}>
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleDeleteProject(project.id)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                            <div className="flex items-center space-x-2">
+                              <Button size="sm" variant="outline" onClick={() => window.open(project.url, "_blank")}>
+                                <ExternalLink className="w-4 h-4" />
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => handleEditProject(project)}>
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleDeleteProject(project.id)}
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  ))}
+                  )}
+
+                  {/* Other Projects Section */}
+                  {projects.some(p => !p.featured) && (
+                    <div
+                    >
+                      <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
+                        <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+                        Project Lainnya ({projects.filter(p => !p.featured).length})
+                      </h4>
+                      <div className="space-y-2">
+                        {projects.filter(project => !project.featured).map((project) => (
+                          <div
+                            key={project.id}
+                            className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <img
+                                src={project.icon || "/placeholder.svg"}
+                                alt={project.name}
+                                className="w-8 h-8 rounded object-cover"
+                              />
+                              <div>
+                                <h3 className="font-medium text-gray-900 text-sm sm:text-base">{project.name}</h3>
+                                <p className="text-sm text-gray-500">{project.url}</p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center space-x-2">
+                              <Button size="sm" variant="outline" onClick={() => window.open(project.url, "_blank")}>
+                                <ExternalLink className="w-4 h-4" />
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => handleEditProject(project)}>
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleDeleteProject(project.id)}
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                    </div>
+                  )}
                 </div>
               )}
             </CardContent>
