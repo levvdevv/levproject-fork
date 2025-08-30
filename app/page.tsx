@@ -61,6 +61,8 @@ interface Project {
   featured: boolean
 }
 
+const defaultProjects: Project[] = []
+
 export default function Portfolio() {
   const [searchTerm, setSearchTerm] = useState("")
   const [projects, setProjects] = useState<Project[]>(defaultProjects)
@@ -231,7 +233,6 @@ export default function Portfolio() {
                 <p className="text-sm text-gray-400">Admin belum menambahkan project apapun</p>
               </CardContent>
             </Card>
-          <div className="text-center py-8">
           </div>
         )}
 
