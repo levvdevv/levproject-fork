@@ -321,8 +321,7 @@ export default function AdminLogin() {
 
                   {/* Other Projects Section */}
                   {projects.some(p => !p.featured) && (
-                    <div
-                    >
+                    <div>
                       <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
                         <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
                         Project Lainnya ({projects.filter(p => !p.featured).length})
@@ -361,6 +360,9 @@ export default function AdminLogin() {
                                 <Trash2 className="w-4 h-4" />
                               </Button>
                             </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
